@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>벨라 - AI 감정 동반자</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -18,50 +18,94 @@
         </div>
     </div>
 
-    <!-- 비디오 배경 -->
-    <div class="video-container">
-        <video autoplay muted class="bg-video active" id="video1">
+    <!-- 비디오 배경 (래퍼의 바깥에 위치) -->
+    <div class="video-container" id="video-container">
+        <video autoplay muted playsinline class="bg-video active" id="video1">
             <source src="video_assets/3d_modeling_image_creation.mp4" type="video/mp4">
             브라우저가 비디오 태그를 지원하지 않습니다.
         </video>
-        <video muted class="bg-video" id="video2">
+        <video muted playsinline class="bg-video" id="video2">
             <source src="" type="video/mp4">
             브라우저가 비디오 태그를 지원하지 않습니다.
         </video>
     </div>
 
-    <!-- 메인 콘텐츠 오버레이 -->
-    <div class="content-overlay">
-
-        <!-- 상단 상태 바 -->
-        <header class="top-bar">
-            <div class="status-container">
-                <div class="favorability-section">
-                    <label for="favorability-bar">호감도</label>
-                    <div class="progress-container">
-                        <div class="progress-fill" id="favorability-bar"></div>
+    <!-- ▼▼▼ 모든 UI를 감싸는 모바일 뷰포트 래퍼 ▼▼▼ -->
+    <div id="mobile-view-wrapper">
+        <!-- UI 오버레이 -->
+        <div class="ui-overlay">
+            <!-- 상단 상태 바 (기본 숨김) -->
+            <header class="top-bar" id="top-bar">
+                <div class="status-container">
+                    <div class="favorability-section">
+                        <label for="favorability-bar">호감도</label>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="favorability-bar"></div>
+                        </div>
+                    </div>
+                    <div class="language-select-container">
+                        <i class="fas fa-language"></i>
+                        <select id="language-select" title="언어 선택">
+                            <option value="ko-KR">한국어</option>
+                            <option value="en-US">English</option>
+                            <option value="ja-JP">日本語</option>
+                            <option value="zh-CN">中文</option>
+                        </select>
                     </div>
                 </div>
-                <div class="connection-status">
-                    <i class="fas fa-wifi"></i>
-                    <span>연결됨</span>
+            </header>
+
+            <!-- 음성 인식 결과 표시 (필요시 나타남) -->
+            <div class="transcript-wrapper">
+                <div class="transcript-container" id="transcript-container">
+                    <div class="transcript-header">
+                        <i class="fas fa-microphone-alt"></i>
+                        <span id="transcript-status">듣는 중...</span>
+                    </div>
+                    <p id="transcript"></p>
                 </div>
             </div>
-        </header>
-
-        <!-- 중앙 메인 인터페이스 -->
-        <main class="main-interface">
-            <!-- 음성 인식 결과 표시 영역 -->
-            <div class="transcript-container">
-                <div class="transcript-header">
-                    <i class="fas fa-microphone-alt"></i>
-                    <span>음성 인식</span>
+            
+            <!-- 액션 메뉴 (하단 버튼으로 제어) -->
+            <div id="menu-container" class="menu-container hidden">
+                <div class="menu-header">
+                    <i class="fas fa-magic"></i>
+                    <span>액션 선택</span>
                 </div>
-                <p id="transcript"></p>
+                <button class="menu-item" data-video="video_assets/2025-07-16-4437-v_pose_smile.mp4">
+                    <i class="fas fa-camera"></i>
+                    <span>포즈</span>
+                </button>
+                <button class="menu-item" data-video="video_assets/cheer_video.mp4">
+                    <i class="fas fa-hands-clapping"></i>
+                    <span>응원</span>
+                </button>
+                <button class="menu-item" data-video="video_assets/dance_video.mp4">
+                    <i class="fas fa-music"></i>
+                    <span>춤</span>
+                </button>
             </div>
+        </div>
 
-            <!-- AI 기능 탭 인터페이스 -->
-            <div class="ai-tabs-container">
+        <!-- 하단 커맨드 센터 (핵심 UI) -->
+        <footer class="command-center">
+            <button id="analysis-tool-button" class="command-button" aria-label="분석 도구 열기">
+                <i class="fas fa-chart-bar"></i>
+            </button>
+            <button class="mic-button" id="mic-button" aria-label="음성 인식 시작">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button id="action-menu-button" class="command-button" aria-label="액션 메뉴 열기">
+                <i class="fas fa-star"></i>
+            </button>
+        </footer>
+
+        <!-- AI 분석용 바텀 시트 (기본 숨김) -->
+        <div id="bottom-sheet" class="bottom-sheet">
+            <div class="sheet-handle-wrapper">
+                <div class="sheet-handle"></div>
+            </div>
+            <div class="sheet-content">
                 <div class="tabs-header">
                     <button class="tab-button active" data-tab="sentiment">
                         <i class="fas fa-heart"></i>
@@ -72,90 +116,34 @@
                         음성 인식
                     </button>
                 </div>
-
                 <!-- 감정 분석 탭 -->
                 <div class="tab-content active" id="sentiment-tab">
-                    <div class="feature-card sentiment-card">
-                        <div class="card-header">
-                            <i class="fas fa-heart"></i>
-                            <h3>감정 분석</h3>
-                        </div>
-                        <div class="card-content">
-                            <input type="text" id="sentiment-input" placeholder="감정을 입력해보세요...">
-                            <button id="analyze-button" class="primary-button">
-                                <i class="fas fa-brain"></i>
-                                분석하기
-                            </button>
-                            <div id="sentiment-result" class="result-display"></div>
-                        </div>
+                    <div class="feature-card">
+                        <input type="text" id="sentiment-input" placeholder="분석할 문장을 입력하세요...">
+                        <button id="analyze-button" class="primary-button">
+                            <i class="fas fa-brain"></i>
+                            분석하기
+                        </button>
+                        <div id="sentiment-result" class="result-display">결과가 여기에 표시됩니다.</div>
                     </div>
                 </div>
-
                 <!-- 음성 인식 탭 -->
                 <div class="tab-content" id="voice-tab">
-                    <div class="feature-card voice-card">
-                        <div class="card-header">
-                            <i class="fas fa-microphone"></i>
-                            <h3>음성 인식</h3>
-                        </div>
-                        <div class="card-content">
-                            <button id="local-mic-button" class="secondary-button">
-                                <i class="fas fa-play"></i>
-                                음성 인식 시작
-                            </button>
-                            <div id="local-asr-result" class="result-display"></div>
-                        </div>
+                    <div class="feature-card">
+                        <button id="local-mic-button" class="secondary-button">
+                            <i class="fas fa-play"></i>
+                            음성 인식 시작
+                        </button>
+                        <div id="local-asr-result" class="result-display">결과가 여기에 표시됩니다.</div>
                     </div>
                 </div>
             </div>
-        </main>
-
-        <!-- 플로팅 액션 버튼 -->
-        <div class="floating-actions">
-            <!-- 메뉴 버튼 -->
-            <div id="floating-button" class="action-button menu-button">
-                <i class="fas fa-bars"></i>
-            </div>
-
-            <!-- 메뉴 컨테이너 -->
-            <div id="menu-container" class="menu-container hidden">
-                <div class="menu-header">
-                    <i class="fas fa-magic"></i>
-                    <span>액션 선택</span>
-                </div>
-                <button class="menu-item" data-video="video_assets/2025-07-16-4437-v_pose_smile.mp4">
-                    <i class="fas fa-camera"></i>
-                    포즈
-                </button>
-                <button class="menu-item" data-video="video_assets/cheer_video.mp4">
-                    <i class="fas fa-hands-clapping"></i>
-                    응원
-                </button>
-                <button class="menu-item" data-video="video_assets/dance_video.mp4">
-                    <i class="fas fa-music"></i>
-                    춤
-                </button>
-            </div>
         </div>
+        
+        <!-- 팝업용 배경 오버레이 -->
+        <div id="overlay" class="overlay hidden"></div>
+    </div> <!-- mobile-view-wrapper 닫기 -->
 
-        <!-- 하단 메인 액션 -->
-        <footer class="bottom-bar">
-            <div class="main-action">
-                <button class="mic-button" id="mic-button" aria-label="음성 인식 시작">
-                    <i class="fas fa-microphone"></i>
-                </button>
-                <div class="action-label">음성으로 대화하기</div>
-            </div>
-            
-            <div class="footer-info">
-                <a href="https://x.com/jackywine" target="_blank" rel="noopener noreferrer" class="footer-credit">
-                    <i class="fab fa-twitter"></i>
-                    @jackywine
-                </a>
-            </div>
-        </footer>
-
-    </div>
 
     <script type="module" src="script.js"></script>
 </body>

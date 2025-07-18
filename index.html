@@ -1,76 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Assistant</title>
+    <title>벨라 - 음성 어시스턴트</title>
     <link rel="stylesheet" href="style.css">
-    <!-- 引入 Font Awesome 图标库，用于麦克风图标 -->
+    <!-- Font Awesome 아이콘 라이브러리 추가, 마이크 아이콘용 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-    <!-- 加载屏幕 -->
+    <!-- 로딩 화면 -->
     <div id="loading-screen">
-        <img src="Bellaicon/Generated image.webp" alt="Loading Bella...">
+        <img src="Bellaicon/Generated image.webp" alt="벨라 로딩 중...">
     </div>
 
-    <!-- 视频背景 -->
+    <!-- 비디오 배경 -->
     <div class="video-container">
         <video autoplay muted class="bg-video active" id="video1">
-            <source src="视频资源/3D 建模图片制作.mp4" type="video/mp4">
-            Your browser does not support the video tag.
+            <source src="video_assets/3d_modeling_image_creation.mp4" type="video/mp4">
+            브라우저가 비디오 태그를 지원하지 않습니다.
         </video>
         <video muted class="bg-video" id="video2">
             <source src="" type="video/mp4">
-            Your browser does not support the video tag.
+            브라우저가 비디오 태그를 지원하지 않습니다.
         </video>
     </div>
 
-    <!-- 内容层，覆盖在视频之上 -->
+    <!-- 콘텐츠 오버레이 (비디오 위에 표시) -->
     <div class="content-overlay">
 
-        <!-- 顶部好感度条 -->
+        <!-- 상단 호감도 바 -->
         <header class="top-bar">
-            <label for="favorability-bar">Favorability</label>
+            <label for="favorability-bar">호감도</label>
             <div class="progress-container">
                 <div class="progress-fill" id="favorability-bar"></div>
             </div>
         </header>
 
-        <!-- 语音识别结果显示区域 -->
+        <!-- 음성 인식 결과 표시 영역 -->
         <div class="transcript-container">
             <p id="transcript"></p>
         </div>
 
-        <!-- 情感分析测试区域 -->
+        <!-- 감정 분석 테스트 영역 -->
         <div class="sentiment-analysis-container">
-            <input type="text" id="sentiment-input" placeholder="对我输入一些文字...">
-            <button id="analyze-button">分析情绪</button>
+            <input type="text" id="sentiment-input" placeholder="여기에 감정을 입력해보세요...">
+            <button id="analyze-button">감정 분석</button>
             <p id="sentiment-result"></p>
         </div>
 
-        <!-- 本地语音识别测试区域 -->
+        <!-- 로컬 음성 인식 테스트 영역 -->
         <div id="local-asr-container" class="local-asr-container">
-            <button id="local-mic-button">开始本地识别</button>
-            <p>本地识别结果: <span id="local-asr-result"></span></p>
+            <button id="local-mic-button">로컬 음성 인식 시작</button>
+            <p>로컬 인식 결과: <span id="local-asr-result"></span></p>
         </div>
 
-        <!-- 悬浮球 -->
+        <!-- 플로팅 메뉴 버튼 -->
         <div id="floating-button">
             <i class="fas fa-bars"></i>
         </div>
 
-        <!-- 悬浮菜单 -->
+        <!-- 플로팅 메뉴 -->
         <div id="menu-container" class="hidden">
-            <button class="menu-item" data-video="视频资源/jimeng-2025-07-16-4437-比耶，然后微笑着优雅的左右摇晃.mp4">Pose</button>
-            <button class="menu-item" data-video="视频资源/生成加油视频.mp4">Cheer</button>
-            <button class="menu-item" data-video="视频资源/生成跳舞视频.mp4">Dance</button>
+            <button class="menu-item" data-video="video_assets/2025-07-16-4437-v_pose_smile.mp4">포즈</button>
+            <button class="menu-item" data-video="video_assets/cheer_video.mp4">응원</button>
+            <button class="menu-item" data-video="video_assets/dance_video.mp4">춤</button>
         </div>
 
-        <!-- 底部麦克风和链接 -->
+        <!-- 하단 마이크 버튼과 링크 -->
         <footer class="bottom-bar">
-            <button class="mic-button" id="mic-button" aria-label="Start Listening">
+            <button class="mic-button" id="mic-button" aria-label="듣기 시작">
                 <i class="fas fa-microphone"></i>
             </button>
             <a href="https://x.com/jackywine" target="_blank" rel="noopener noreferrer" class="footer-credit">

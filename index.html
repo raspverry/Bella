@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>벨라 - 음성 어시스턴트</title>
+    <title>벨라 - AI 감정 동반자</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Font Awesome 아이콘 라이브러리 추가, 마이크 아이콘용 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
     <!-- 로딩 화면 -->
     <div id="loading-screen">
-        <img src="Bellaicon/Generated image.webp" alt="벨라 로딩 중...">
+        <div class="loading-content">
+            <img src="Bellaicon/Generated image.webp" alt="벨라 로딩 중...">
+            <div class="loading-text">벨라를 준비하고 있습니다...</div>
+            <div class="loading-spinner"></div>
+        </div>
     </div>
 
     <!-- 비디오 배경 -->
@@ -27,55 +30,129 @@
         </video>
     </div>
 
-    <!-- 콘텐츠 오버레이 (비디오 위에 표시) -->
+    <!-- 메인 콘텐츠 오버레이 -->
     <div class="content-overlay">
 
-        <!-- 상단 호감도 바 -->
+        <!-- 상단 상태 바 -->
         <header class="top-bar">
-            <label for="favorability-bar">호감도</label>
-            <div class="progress-container">
-                <div class="progress-fill" id="favorability-bar"></div>
+            <div class="status-container">
+                <div class="favorability-section">
+                    <label for="favorability-bar">호감도</label>
+                    <div class="progress-container">
+                        <div class="progress-fill" id="favorability-bar"></div>
+                    </div>
+                </div>
+                <div class="connection-status">
+                    <i class="fas fa-wifi"></i>
+                    <span>연결됨</span>
+                </div>
             </div>
         </header>
 
-        <!-- 음성 인식 결과 표시 영역 -->
-        <div class="transcript-container">
-            <p id="transcript"></p>
+        <!-- 중앙 메인 인터페이스 -->
+        <main class="main-interface">
+            <!-- 음성 인식 결과 표시 영역 -->
+            <div class="transcript-container">
+                <div class="transcript-header">
+                    <i class="fas fa-microphone-alt"></i>
+                    <span>음성 인식</span>
+                </div>
+                <p id="transcript"></p>
+            </div>
+
+            <!-- AI 기능 탭 인터페이스 -->
+            <div class="ai-tabs-container">
+                <div class="tabs-header">
+                    <button class="tab-button active" data-tab="sentiment">
+                        <i class="fas fa-heart"></i>
+                        감정 분석
+                    </button>
+                    <button class="tab-button" data-tab="voice">
+                        <i class="fas fa-microphone"></i>
+                        음성 인식
+                    </button>
+                </div>
+
+                <!-- 감정 분석 탭 -->
+                <div class="tab-content active" id="sentiment-tab">
+                    <div class="feature-card sentiment-card">
+                        <div class="card-header">
+                            <i class="fas fa-heart"></i>
+                            <h3>감정 분석</h3>
+                        </div>
+                        <div class="card-content">
+                            <input type="text" id="sentiment-input" placeholder="감정을 입력해보세요...">
+                            <button id="analyze-button" class="primary-button">
+                                <i class="fas fa-brain"></i>
+                                분석하기
+                            </button>
+                            <div id="sentiment-result" class="result-display"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 음성 인식 탭 -->
+                <div class="tab-content" id="voice-tab">
+                    <div class="feature-card voice-card">
+                        <div class="card-header">
+                            <i class="fas fa-microphone"></i>
+                            <h3>음성 인식</h3>
+                        </div>
+                        <div class="card-content">
+                            <button id="local-mic-button" class="secondary-button">
+                                <i class="fas fa-play"></i>
+                                음성 인식 시작
+                            </button>
+                            <div id="local-asr-result" class="result-display"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 플로팅 액션 버튼 -->
+        <div class="floating-actions">
+            <!-- 메뉴 버튼 -->
+            <div id="floating-button" class="action-button menu-button">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <!-- 메뉴 컨테이너 -->
+            <div id="menu-container" class="menu-container hidden">
+                <div class="menu-header">
+                    <i class="fas fa-magic"></i>
+                    <span>액션 선택</span>
+                </div>
+                <button class="menu-item" data-video="video_assets/2025-07-16-4437-v_pose_smile.mp4">
+                    <i class="fas fa-camera"></i>
+                    포즈
+                </button>
+                <button class="menu-item" data-video="video_assets/cheer_video.mp4">
+                    <i class="fas fa-hands-clapping"></i>
+                    응원
+                </button>
+                <button class="menu-item" data-video="video_assets/dance_video.mp4">
+                    <i class="fas fa-music"></i>
+                    춤
+                </button>
+            </div>
         </div>
 
-        <!-- 감정 분석 테스트 영역 -->
-        <div class="sentiment-analysis-container">
-            <input type="text" id="sentiment-input" placeholder="여기에 감정을 입력해보세요...">
-            <button id="analyze-button">감정 분석</button>
-            <p id="sentiment-result"></p>
-        </div>
-
-        <!-- 로컬 음성 인식 테스트 영역 -->
-        <div id="local-asr-container" class="local-asr-container">
-            <button id="local-mic-button">로컬 음성 인식 시작</button>
-            <p>로컬 인식 결과: <span id="local-asr-result"></span></p>
-        </div>
-
-        <!-- 플로팅 메뉴 버튼 -->
-        <div id="floating-button">
-            <i class="fas fa-bars"></i>
-        </div>
-
-        <!-- 플로팅 메뉴 -->
-        <div id="menu-container" class="hidden">
-            <button class="menu-item" data-video="video_assets/2025-07-16-4437-v_pose_smile.mp4">포즈</button>
-            <button class="menu-item" data-video="video_assets/cheer_video.mp4">응원</button>
-            <button class="menu-item" data-video="video_assets/dance_video.mp4">춤</button>
-        </div>
-
-        <!-- 하단 마이크 버튼과 링크 -->
+        <!-- 하단 메인 액션 -->
         <footer class="bottom-bar">
-            <button class="mic-button" id="mic-button" aria-label="듣기 시작">
-                <i class="fas fa-microphone"></i>
-            </button>
-            <a href="https://x.com/jackywine" target="_blank" rel="noopener noreferrer" class="footer-credit">
-                @jackywine
-            </a>
+            <div class="main-action">
+                <button class="mic-button" id="mic-button" aria-label="음성 인식 시작">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <div class="action-label">음성으로 대화하기</div>
+            </div>
+            
+            <div class="footer-info">
+                <a href="https://x.com/jackywine" target="_blank" rel="noopener noreferrer" class="footer-credit">
+                    <i class="fab fa-twitter"></i>
+                    @jackywine
+                </a>
+            </div>
         </footer>
 
     </div>

@@ -3,15 +3,51 @@ import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    // --- 탭 인터페이스 기능 ---
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+            
+            // 모든 탭 버튼 비활성화
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            // 모든 탭 콘텐츠 숨기기
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // 클릭된 탭 활성화
+            button.classList.add('active');
+            document.getElementById(`${targetTab}-tab`).classList.add('active');
+            
+            // 탭 전환 알림
+            const tabName = button.textContent.trim();
+            showNotification(`${tabName} 탭으로 전환되었습니다.`, 'info');
+        });
+    });
+
     // --- 로딩 화면 처리 ---
     const loadingScreen = document.getElementById('loading-screen');
+    const loadingText = document.querySelector('.loading-text');
+    const loadingSpinner = document.querySelector('.loading-spinner');
+    
+    // 로딩 진행률 시뮬레이션
+    let loadingProgress = 0;
+    const loadingInterval = setInterval(() => {
+        loadingProgress += Math.random() * 15;
+        if (loadingProgress >= 100) {
+            loadingProgress = 100;
+            clearInterval(loadingInterval);
+        }
+        loadingText.textContent = `벨라를 준비하고 있습니다... ${Math.round(loadingProgress)}%`;
+    }, 200);
+
     setTimeout(() => {
         loadingScreen.style.opacity = '0';
-        // 애니메이션 종료 후 숨김 처리하여 상호작용을 방해하지 않도록 함
         setTimeout(() => {
             loadingScreen.style.display = 'none';
-        }, 500); // 이 시간은 CSS의 transition 시간과 일치해야 함
-    }, 1500); // 1.5초 후 페이드아웃 시작
+        }, 500);
+    }, 2000);
     
     // 필요한 DOM 요소 가져오기
     let video1 = document.getElementById('video1');
@@ -39,6 +75,23 @@ document.addEventListener('DOMContentLoaded', function() {
         'video_assets/dance_video.mp4',
         'negative/2025-07-16-9418-hands_hips_pout_angry.mp4'
     ];
+
+    // --- 호감도 시스템 ---
+    let favorability = 65;
+    
+    function updateFavorability(change) {
+        favorability = Math.max(0, Math.min(100, favorability + change));
+        favorabilityBar.style.width = favorability + '%';
+        
+        // 호감도에 따른 색상 변화
+        if (favorability >= 80) {
+            favorabilityBar.style.background = 'linear-gradient(90deg, #4CAF50, #45a049)';
+        } else if (favorability >= 50) {
+            favorabilityBar.style.background = 'linear-gradient(90deg, #ff9a9e, #fecfef)';
+        } else {
+            favorabilityBar.style.background = 'linear-gradient(90deg, #f44336, #d32f2f)';
+        }
+    }
 
     // --- 비디오 크로스페이드 재생 기능 ---
     function switchVideo() {
@@ -78,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 초기 시작
     activeVideo.addEventListener('ended', switchVideo, { once: true });
-
 
     // --- 음성 인식 핵심 ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -126,7 +178,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let isListening = false;
 
     micButton.addEventListener('click', function() {
-        if (!SpeechRecognition) return; // 지원하지 않으면 아무 작업도 수행하지 않음
+        if (!SpeechRecognition) {
+            showNotification('브라우저가 음성 인식을 지원하지 않습니다.', 'error');
+            return;
+        }
 
         isListening = !isListening;
         micButton.classList.toggle('is-listening', isListening);
@@ -134,16 +189,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const transcriptText = document.getElementById('transcript');
 
         if (isListening) {
-            transcriptText.textContent = '듣는 중...'; // 즉시 힌트 표시
+            transcriptText.textContent = '듣는 중...';
             transcriptContainer.classList.add('visible');
             recognition.start();
+            showNotification('음성 인식이 시작되었습니다.', 'success');
         } else {
             recognition.stop();
             transcriptContainer.classList.remove('visible');
-            transcriptText.textContent = ''; // 텍스트 지우기
+            transcriptText.textContent = '';
+            showNotification('음성 인식이 중지되었습니다.', 'info');
         }
     });
-
 
     // --- 플로팅 버튼 상호작용 ---
     floatingButton.addEventListener('click', (event) => {
@@ -154,8 +210,10 @@ document.addEventListener('DOMContentLoaded', function() {
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
             const videoSrc = this.getAttribute('data-video');
+            const actionName = this.textContent.trim();
             playSpecificVideo(videoSrc);
             menuContainer.classList.add('hidden');
+            showNotification(`${actionName} 액션이 실행되었습니다!`, 'success');
         });
     });
 
@@ -170,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
     menuContainer.addEventListener('click', (event) => {
         event.stopPropagation();
     });
-
 
     function playSpecificVideo(videoSrc) {
         const currentVideoSrc = activeVideo.querySelector('source').getAttribute('src');
@@ -206,9 +263,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let classifier;
     analyzeButton.addEventListener('click', async () => {
         const text = sentimentInput.value;
-        if (!text) return;
+        if (!text) {
+            showNotification('분석할 텍스트를 입력해주세요.', 'warning');
+            return;
+        }
 
         sentimentResult.textContent = '분석 중...';
+        analyzeButton.disabled = true;
+        analyzeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 분석 중...';
 
         // 첫 번째 클릭 시 분류기 초기화
         if (!classifier) {
@@ -231,12 +293,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (positiveKeywords.some(keyword => lowerText.includes(keyword))) {
                     emotion = 'POSITIVE';
                     score = 0.8;
+                    updateFavorability(5);
                 } else if (negativeKeywords.some(keyword => lowerText.includes(keyword))) {
                     emotion = 'NEGATIVE';
                     score = 0.2;
+                    updateFavorability(-5);
                 }
                 
                 sentimentResult.textContent = `감정: ${emotion}, 점수: ${score.toFixed(2)} (기본 분석)`;
+                analyzeButton.disabled = false;
+                analyzeButton.innerHTML = '<i class="fas fa-brain"></i> 분석하기';
                 return;
             }
         }
@@ -246,12 +312,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await classifier(text);
             const primaryEmotion = result[0];
             sentimentResult.textContent = `감정: ${primaryEmotion.label}, 점수: ${primaryEmotion.score.toFixed(2)}`;
+            
+            // 감정에 따른 호감도 변화
+            if (primaryEmotion.label === 'POSITIVE') {
+                updateFavorability(3);
+            } else if (primaryEmotion.label === 'NEGATIVE') {
+                updateFavorability(-3);
+            }
+            
+            showNotification('감정 분석이 완료되었습니다!', 'success');
         } catch (error) {
             console.error('감정 분석 실패:', error);
             sentimentResult.textContent = '분석 중 오류가 발생했습니다.';
+            showNotification('감정 분석 중 오류가 발생했습니다.', 'error');
         }
+        
+        analyzeButton.disabled = false;
+        analyzeButton.innerHTML = '<i class="fas fa-brain"></i> 분석하기';
     });
-
 
     // --- 로컬 음성 인식 --- //
     const localMicButton = document.getElementById('local-mic-button');
@@ -266,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isRecording) {
             mediaRecorder.stop();
             isRecording = false;
-            localMicButton.textContent = '로컬 음성 인식 시작';
+            localMicButton.textContent = '음성 인식 시작';
             localMicButton.classList.remove('recording');
             return;
         }
@@ -281,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('음성 인식 모델 로딩 실패:', error);
                 localAsrResult.textContent = '음성 인식 모델 로딩에 실패했습니다.';
+                showNotification('음성 인식 모델 로딩에 실패했습니다.', 'error');
                 return;
             }
         }
@@ -313,9 +392,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     localAsrResult.textContent = '인식 중...';
                     const output = await recognizer(rawAudio);
                     localAsrResult.textContent = output.text || '인식할 수 있는 내용이 없습니다.';
+                    
+                    if (output.text) {
+                        showNotification('음성 인식이 완료되었습니다!', 'success');
+                    }
                 } catch(e) {
                     console.error('오디오 디코딩 또는 인식 실패:', e);
                     localAsrResult.textContent = '오디오 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+                    showNotification('오디오 처리 중 오류가 발생했습니다.', 'error');
                 }
             });
 
@@ -323,26 +407,54 @@ document.addEventListener('DOMContentLoaded', function() {
             isRecording = true;
             localMicButton.textContent = '녹음 중... 클릭하여 중지';
             localMicButton.classList.add('recording');
+            showNotification('음성 녹음이 시작되었습니다.', 'info');
 
         } catch (error) {
             console.error('음성 인식 실패:', error);
             localAsrResult.textContent = '마이크에 접근할 수 없거나 인식 중 오류가 발생했습니다.';
             isRecording = false; // 상태 재설정
-            localMicButton.textContent = '로컬 음성 인식 시작';
+            localMicButton.textContent = '음성 인식 시작';
             localMicButton.classList.remove('recording');
+            showNotification('마이크 접근 권한이 필요합니다.', 'error');
         }
     };
 
     localMicButton.addEventListener('click', handleRecord);
 
+    // --- 알림 시스템 ---
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // 애니메이션 효과
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // 자동 제거
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
 
     function analyzeAndReact(text) {
         let reaction = 'neutral'; // 기본값은 중성
 
         if (positiveWords.some(word => text.includes(word))) {
             reaction = 'positive';
+            updateFavorability(2);
         } else if (negativeWords.some(word => text.includes(word))) {
             reaction = 'negative';
+            updateFavorability(-2);
         }
 
         if (reaction !== 'neutral') {
@@ -378,5 +490,19 @@ document.addEventListener('DOMContentLoaded', function() {
             activeVideo.addEventListener('ended', switchVideo, { once: true });
         }, { once: true });
     }
+
+    // --- 키보드 단축키 ---
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && document.activeElement === sentimentInput) {
+            analyzeButton.click();
+        }
+        if (event.key === ' ' && !event.target.matches('input, textarea')) {
+            event.preventDefault();
+            micButton.click();
+        }
+    });
+
+    // --- 초기 설정 ---
+    updateFavorability(0); // 초기 호감도 설정
 
 });

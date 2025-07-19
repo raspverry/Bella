@@ -93,9 +93,7 @@ body {
 .favorability-section label { font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; display: block; }
 .progress-container { width: 100%; height: 5px; background-color: rgba(255, 255, 255, 0.2); border-radius: 5px; }
 .progress-fill { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
-.language-select-container i { color: rgba(255, 255, 255, 0.8); }
-#language-select { background: transparent; border: none; color: white; font-size: 0.9rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; padding: 4px; border-radius: 4px; text-align: right; }
-#language-select option { background-color: #333; color: white; }
+
 
 /* --- 음성 인식 결과 --- */
 .transcript-wrapper {
@@ -161,18 +159,27 @@ body {
 .menu-item:hover { background-color: rgba(255, 255, 255, 0.1); }
 .menu-item i { width: 24px; text-align: center; }
 
+/* --- 메뉴 구분선 --- */
+.menu-divider {
+    border: none;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 10px 0;
+}
+.language-option.active { background-color: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+
 /* --- AI 분석용 바텀 시트 --- */
 .bottom-sheet {
-    position: absolute; bottom: 0; left: 0; width: 100%;
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+    width: 100%; max-width: 400px;
     background: #1c1c1e;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -5px 30px rgba(0,0,0,0.3);
-    transform: translateY(100%);
     transition: transform 0.4s ease-out;
     z-index: 200; pointer-events: auto;
     max-height: 70vh; display: flex; flex-direction: column;
 }
-.bottom-sheet.visible { transform: translateY(0); }
+.bottom-sheet.visible { transform: translateX(-50%) translateY(0); }
 .sheet-handle-wrapper { padding: 15px; cursor: grab; }
 .sheet-handle { width: 40px; height: 5px; background: #555; border-radius: 2.5px; margin: 0 auto; }
 .sheet-content {
@@ -191,13 +198,96 @@ body {
     display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .tab-button.active { color: white; background: #555; }
-.tab-content {
-    display: none;
-    padding: 0 15px;
-}
+.tab-content { display: none; padding: 0 15px; }
 .tab-content.active { display: block; }
 .feature-card { display: flex; flex-direction: column; gap: 15px; }
-#sentiment-input { width: 100%; padding: 15px; border: 1px solid #444; border-radius: 12px; background: #333; color: white; font-size: 1rem; }
+
+/* --- 입력 필드 및 버튼 스타일 --- */
+#sentiment-input {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #444;
+    border-radius: 12px;
+    background: #333;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#sentiment-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+#sentiment-input::placeholder {
+    color: #aaa;
+}
+
+/* --- 설정 탭 스타일 --- */
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    background: #333;
+    border-radius: 12px;
+    border: 1px solid #444;
+}
+
+.setting-item label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.setting-item label i {
+    color: #4CAF50;
+    width: 20px;
+    text-align: center;
+}
+
+.setting-dropdown {
+    width: 100%;
+    padding: 12px 15px;
+    background: #444;
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.setting-dropdown:hover {
+    background-color: #555;
+    border-color: #666;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234CAF50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.setting-dropdown:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234CAF50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.setting-dropdown option {
+    background: #333;
+    color: white;
+    padding: 10px;
+}
 .primary-button, .secondary-button { padding: 15px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .primary-button { background: #4CAF50; color: white; }
 .secondary-button { background: #555; color: white; }
@@ -205,7 +295,7 @@ body {
 
 /* --- 배경 오버레이 --- */
 .overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5);
     opacity: 0; transition: opacity 0.4s ease-out;
     z-index: 150; pointer-events: none;

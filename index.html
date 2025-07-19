@@ -43,15 +43,6 @@
                             <div class="progress-fill" id="favorability-bar"></div>
                         </div>
                     </div>
-                    <div class="language-select-container">
-                        <i class="fas fa-language"></i>
-                        <select id="language-select" title="언어 선택">
-                            <option value="ko-KR">한국어</option>
-                            <option value="en-US">English</option>
-                            <option value="ja-JP">日本語</option>
-                            <option value="zh-CN">中文</option>
-                        </select>
-                    </div>
                 </div>
             </header>
 
@@ -100,49 +91,70 @@
             </button>
         </footer>
 
-        <!-- AI 분석용 바텀 시트 (기본 숨김) -->
-        <div id="bottom-sheet" class="bottom-sheet">
-            <div class="sheet-handle-wrapper">
-                <div class="sheet-handle"></div>
+        <!-- 팝업용 배경 오버레이 -->
+        <div id="overlay" class="overlay hidden"></div>
+    </div> <!-- mobile-view-wrapper 닫기 -->
+
+    <!-- AI 분석용 바텀 시트 (기본 숨김) - 래퍼 밖에 배치 -->
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="sheet-handle-wrapper">
+            <div class="sheet-handle"></div>
+        </div>
+        <div class="sheet-content">
+            <div class="tabs-header">
+                <button class="tab-button active" data-tab="sentiment">
+                    <i class="fas fa-heart"></i>
+                    감정 분석
+                </button>
+                <button class="tab-button" data-tab="voice">
+                    <i class="fas fa-microphone"></i>
+                    음성 인식
+                </button>
+                <button class="tab-button" data-tab="settings">
+                    <i class="fas fa-cog"></i>
+                    설정
+                </button>
             </div>
-            <div class="sheet-content">
-                <div class="tabs-header">
-                    <button class="tab-button active" data-tab="sentiment">
-                        <i class="fas fa-heart"></i>
-                        감정 분석
+            <!-- 감정 분석 탭 -->
+            <div class="tab-content active" id="sentiment-tab">
+                <div class="feature-card">
+                    <input type="text" id="sentiment-input" placeholder="분석할 문장을 입력하세요...">
+                    <button id="analyze-button" class="primary-button">
+                        <i class="fas fa-brain"></i>
+                        분석하기
                     </button>
-                    <button class="tab-button" data-tab="voice">
-                        <i class="fas fa-microphone"></i>
-                        음성 인식
+                    <div id="sentiment-result" class="result-display">결과가 여기에 표시됩니다.</div>
+                </div>
+            </div>
+            <!-- 음성 인식 탭 -->
+            <div class="tab-content" id="voice-tab">
+                <div class="feature-card">
+                    <button id="local-mic-button" class="secondary-button">
+                        <i class="fas fa-play"></i>
+                        음성 인식 시작
                     </button>
+                    <div id="local-asr-result" class="result-display">결과가 여기에 표시됩니다.</div>
                 </div>
-                <!-- 감정 분석 탭 -->
-                <div class="tab-content active" id="sentiment-tab">
-                    <div class="feature-card">
-                        <input type="text" id="sentiment-input" placeholder="분석할 문장을 입력하세요...">
-                        <button id="analyze-button" class="primary-button">
-                            <i class="fas fa-brain"></i>
-                            분석하기
-                        </button>
-                        <div id="sentiment-result" class="result-display">결과가 여기에 표시됩니다.</div>
-                    </div>
-                </div>
-                <!-- 음성 인식 탭 -->
-                <div class="tab-content" id="voice-tab">
-                    <div class="feature-card">
-                        <button id="local-mic-button" class="secondary-button">
-                            <i class="fas fa-play"></i>
-                            음성 인식 시작
-                        </button>
-                        <div id="local-asr-result" class="result-display">결과가 여기에 표시됩니다.</div>
+            </div>
+            <!-- 설정 탭 -->
+            <div class="tab-content" id="settings-tab">
+                <div class="feature-card">
+                    <div class="setting-item">
+                        <label for="language-select">
+                            <i class="fas fa-language"></i>
+                            언어 설정
+                        </label>
+                        <select id="language-select" class="setting-dropdown">
+                            <option value="ko-KR">한국어</option>
+                            <option value="en-US">English</option>
+                            <option value="ja-JP">日本語</option>
+                            <option value="zh-CN">中文</option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- 팝업용 배경 오버레이 -->
-        <div id="overlay" class="overlay hidden"></div>
-    </div> <!-- mobile-view-wrapper 닫기 -->
+    </div>
 
 
     <script type="module" src="script.js"></script>

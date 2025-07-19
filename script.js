@@ -222,6 +222,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // --- 언어 설정 드롭다운 이벤트 ---
+    const languageSelect = document.getElementById('language-select');
+    languageSelect.addEventListener('change', function() {
+        const selectedLang = this.value;
+        if (recognition) {
+            recognition.lang = selectedLang;
+        }
+        showNotification(`언어가 ${this.options[this.selectedIndex].text}로 변경되었습니다.`, 'success');
+    });
+
     // 감정 분석 (Transformers.js)
     let classifier;
     analyzeButton.addEventListener('click', async () => {
